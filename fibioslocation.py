@@ -231,15 +231,17 @@ def push_to_hc3(payload: list[dict], host: str, user: str, password: str,
     """
     Push device locations to HC3 via:
       POST http://<host>/api/devices/<id>/action/iosLocation
-      {"args": [<json data>]}
+      {"args": ["<utf-8 json string>"]}
+    The arg1 value is a UTF-8 JSON string; decode on HC3 with json.decode(args[1], "utf-8").
     Returns True on success.
     """
     url = f"http://{host}/api/devices/{device_id}/action/iosLocation"
+    json_str = json.dumps(payload, ensure_ascii=False)
     try:
         resp = _requests.post(
             url,
             auth=(user, password),
-            json={"args": [payload]},
+            json={"args": [json_str]},
             timeout=10,
         )
         resp.raise_for_status()
